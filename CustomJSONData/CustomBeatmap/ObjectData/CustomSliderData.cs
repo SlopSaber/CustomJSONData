@@ -1,4 +1,6 @@
-﻿namespace CustomJSONData.CustomBeatmap
+﻿using System;
+
+namespace CustomJSONData.CustomBeatmap
 {
     public class CustomSliderData : SliderData, ICustomData, IVersionable
     {
@@ -7,6 +9,10 @@
             ColorType colorType,
             bool hasHeadNote,
             float headTime,
+#if LATEST
+            float headBeat,
+            int rotation,
+#endif
             int headLineIndex,
             NoteLineLayer headLineLayer,
             NoteLineLayer headBeforeJumpLineLayer,
@@ -15,6 +21,7 @@
             float headCutDirectionAngleOffset,
             bool hasTailNote,
             float tailTime,
+            int tailRotation,
             int tailLineIndex,
             NoteLineLayer tailLineLayer,
             NoteLineLayer tailBeforeJumpLineLayer,
@@ -25,12 +32,16 @@
             int sliceCount,
             float squishAmount,
             CustomData customData,
-            bool version260AndEarlier)
+            Version version)
             : base(
                 sliderType,
                 colorType,
                 hasHeadNote,
                 headTime,
+#if LATEST
+                headBeat,
+                rotation,
+#endif
                 headLineIndex,
                 headLineLayer,
                 headBeforeJumpLineLayer,
@@ -39,6 +50,9 @@
                 headCutDirectionAngleOffset,
                 hasTailNote,
                 tailTime,
+#if LATEST
+                tailRotation,
+#endif
                 tailLineIndex,
                 tailLineLayer,
                 tailBeforeJumpLineLayer,
@@ -50,22 +64,29 @@
                 squishAmount)
         {
             this.customData = customData;
-            version2_6_0AndEarlier = version260AndEarlier;
+            this.version = version;
         }
 
         public CustomData customData { get; }
 
-        public bool version2_6_0AndEarlier { get; }
+        public Version version { get; }
 
         public static SliderData CreateCustomSliderData(
             ColorType colorType,
             float headTime,
+#if LATEST
+            float headBeat,
+            int rotation,
+#endif
             int headLineIndex,
             NoteLineLayer headLineLayer,
             NoteLineLayer headBeforeJumpLineLayer,
             float headControlPointLengthMultiplier,
             NoteCutDirection headCutDirection,
             float tailTime,
+#if LATEST
+            int tailRotation,
+#endif
             int tailLineIndex,
             NoteLineLayer tailLineLayer,
             NoteLineLayer tailBeforeJumpLineLayer,
@@ -73,13 +94,17 @@
             NoteCutDirection tailCutDirection,
             SliderMidAnchorMode midAnchorMode,
             CustomData customData,
-            bool version260AndEarlier)
+            Version version)
         {
             return new CustomSliderData(
                 Type.Normal,
                 colorType,
                 false,
                 headTime,
+#if LATEST
+                headBeat,
+                rotation,
+#endif
                 headLineIndex,
                 headLineLayer,
                 headBeforeJumpLineLayer,
@@ -88,6 +113,9 @@
                 0,
                 false,
                 tailTime,
+#if LATEST
+                tailRotation,
+#endif
                 tailLineIndex,
                 tailLineLayer,
                 tailBeforeJumpLineLayer,
@@ -98,30 +126,41 @@
                 0,
                 1,
                 customData,
-                version260AndEarlier);
+                version);
         }
 
         public static SliderData CreateCustomBurstSliderData(
             ColorType colorType,
             float headTime,
+#if LATEST
+            float headBeat,
+            int rotation,
+#endif
             int headLineIndex,
             NoteLineLayer headLineLayer,
             NoteLineLayer headBeforeJumpLineLayer,
             NoteCutDirection headCutDirection,
             float tailTime,
+#if LATEST
+            int tailRotation,
+#endif
             int tailLineIndex,
             NoteLineLayer tailLineLayer,
             NoteLineLayer tailBeforeJumpLineLayer,
-            NoteCutDirection tailCutDirection,
             int sliceCount,
             float squishAmount,
-            CustomData customData)
+            CustomData customData,
+            Version version)
         {
             return new CustomSliderData(
                 Type.Burst,
                 colorType,
                 false,
                 headTime,
+#if LATEST
+                headBeat,
+                rotation,
+#endif
                 headLineIndex,
                 headLineLayer,
                 headBeforeJumpLineLayer,
@@ -130,17 +169,20 @@
                 0,
                 false,
                 tailTime,
+#if LATEST
+                tailRotation,
+#endif
                 tailLineIndex,
                 tailLineLayer,
                 tailBeforeJumpLineLayer,
                 0,
-                tailCutDirection,
+                NoteCutDirection.Any,
                 0,
                 SliderMidAnchorMode.Straight,
                 sliceCount,
                 squishAmount,
                 customData,
-                false);
+                version);
         }
 
         public override BeatmapDataItem GetCopy()
@@ -150,6 +192,10 @@
                 colorType,
                 hasHeadNote,
                 time,
+#if LATEST
+                beat,
+                rotation,
+#endif
                 headLineIndex,
                 headLineLayer,
                 headBeforeJumpLineLayer,
@@ -158,6 +204,9 @@
                 headCutDirectionAngleOffset,
                 hasTailNote,
                 tailTime,
+#if LATEST
+                tailRotation,
+#endif
                 tailLineIndex,
                 tailLineLayer,
                 tailBeforeJumpLineLayer,
@@ -168,7 +217,7 @@
                 sliceCount,
                 squishAmount,
                 customData.Copy(),
-                version2_6_0AndEarlier);
+                version);
         }
     }
 }

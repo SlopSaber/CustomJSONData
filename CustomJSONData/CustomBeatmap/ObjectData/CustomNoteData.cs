@@ -1,9 +1,15 @@
-﻿namespace CustomJSONData.CustomBeatmap
+﻿using System;
+
+namespace CustomJSONData.CustomBeatmap
 {
     public class CustomNoteData : NoteData, ICustomData, IVersionable
     {
         public CustomNoteData(
             float time,
+#if LATEST
+            float beat,
+            int rotation,
+#endif
             int lineIndex,
             NoteLineLayer noteLineLayer,
             NoteLineLayer beforeJumpNoteLineLayer,
@@ -18,68 +24,54 @@
             float cutDirectionAngleOffset,
             float cutSfxVolumeMultiplier,
             CustomData customData,
-            bool version260AndEarlier)
-                       : base(
-                             time,
-                             lineIndex,
-                             noteLineLayer,
-                             beforeJumpNoteLineLayer,
-                             gameplayType,
-                             scoringType,
-                             colorType,
-                             cutDirection,
-                             timeToNextColorNote,
-                             timeToPrevColorNote,
-                             flipLineIndex,
-                             flipYSide,
-                             cutDirectionAngleOffset,
-                             cutSfxVolumeMultiplier)
+            Version version)
+            : base(
+                time,
+#if LATEST
+                beat,
+                rotation,
+#endif
+                lineIndex,
+                noteLineLayer,
+                beforeJumpNoteLineLayer,
+                gameplayType,
+                scoringType,
+                colorType,
+                cutDirection,
+                timeToNextColorNote,
+                timeToPrevColorNote,
+                flipLineIndex,
+                flipYSide,
+                cutDirectionAngleOffset,
+                cutSfxVolumeMultiplier)
         {
             this.customData = customData;
-            version2_6_0AndEarlier = version260AndEarlier;
+            this.version = version;
         }
 
         public CustomData customData { get; }
 
-        public bool version2_6_0AndEarlier { get; }
-
-        public static CustomNoteData CreateCustomBombNoteData(
-            float time,
-            int lineIndex,
-            NoteLineLayer noteLineLayer,
-            CustomData customData,
-            bool version260AndEarlier)
-        {
-            return new CustomNoteData(
-                time,
-                lineIndex,
-                noteLineLayer,
-                noteLineLayer,
-                GameplayType.Bomb,
-                ScoringType.NoScore,
-                ColorType.None,
-                NoteCutDirection.None,
-                0f,
-                0f,
-                lineIndex,
-                0f,
-                0f,
-                1f,
-                customData,
-                version260AndEarlier);
-        }
+        public Version version { get; }
 
         public static CustomNoteData CreateCustomBasicNoteData(
             float time,
+#if LATEST
+            float beat,
+            int rotation,
+#endif
             int lineIndex,
             NoteLineLayer noteLineLayer,
             ColorType colorType,
             NoteCutDirection cutDirection,
             CustomData customData,
-            bool version260AndEarlier)
+            Version version)
         {
             return new CustomNoteData(
                 time,
+#if LATEST
+                beat,
+                rotation,
+#endif
                 lineIndex,
                 noteLineLayer,
                 noteLineLayer,
@@ -94,11 +86,49 @@
                 0f,
                 1f,
                 customData,
-                version260AndEarlier);
+                version);
+        }
+
+        public static CustomNoteData CreateCustomBombNoteData(
+            float time,
+#if LATEST
+            float beat,
+            int rotation,
+#endif
+            int lineIndex,
+            NoteLineLayer noteLineLayer,
+            CustomData customData,
+            Version version)
+        {
+            return new CustomNoteData(
+                time,
+#if LATEST
+                beat,
+                rotation,
+#endif
+                lineIndex,
+                noteLineLayer,
+                noteLineLayer,
+                GameplayType.Bomb,
+                ScoringType.NoScore,
+                ColorType.None,
+                NoteCutDirection.None,
+                0f,
+                0f,
+                lineIndex,
+                0f,
+                0f,
+                1f,
+                customData,
+                version);
         }
 
         public static CustomNoteData CreateCustomBurstSliderNoteData(
             float time,
+#if LATEST
+            float beat,
+            int rotation,
+#endif
             int lineIndex,
             NoteLineLayer noteLineLayer,
             NoteLineLayer beforeJumpNoteLineLayer,
@@ -109,6 +139,10 @@
         {
             return new CustomNoteData(
                 time,
+#if LATEST
+                beat,
+                rotation,
+#endif
                 lineIndex,
                 noteLineLayer,
                 beforeJumpNoteLineLayer,
@@ -123,13 +157,17 @@
                 0f,
                 cutSfxVolumeMultiplier,
                 customData,
-                false);
+                VersionExtensions.version3);
         }
 
         public override BeatmapDataItem GetCopy()
         {
             return new CustomNoteData(
                 time,
+#if LATEST
+                beat,
+                rotation,
+#endif
                 lineIndex,
                 noteLineLayer,
                 beforeJumpNoteLineLayer,
@@ -144,7 +182,7 @@
                 cutDirectionAngleOffset,
                 cutSfxVolumeMultiplier,
                 customData.Copy(),
-                version2_6_0AndEarlier);
+                version);
         }
     }
 }

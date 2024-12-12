@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using IPA.Utilities;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -52,6 +51,20 @@ namespace CustomJSONData.CustomBeatmap
 
         public T? Get<T>(string key)
         {
+            // trygetvalue missing [notnullwhen] attribute :(
+            if (!TryGetValue(key, out object? value) || value == null)
+            {
+                return default;
+            }
+
+            Type resultType = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+            if (IsNumericType(value))
+            {
+                return (T)Convert.ChangeType(value, resultType);
+            }
+
+            return (T)value;
+
             static bool IsNumericType(object o)
             {
                 switch (Type.GetTypeCode(o.GetType()))
@@ -72,20 +85,6 @@ namespace CustomJSONData.CustomBeatmap
                         return false;
                 }
             }
-
-            // trygetvalue missing [notnullwhen] attribute :(
-            if (!TryGetValue(key, out object? value) || value == null)
-            {
-                return default;
-            }
-
-            Type resultType = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
-            if (IsNumericType(value))
-            {
-                return (T)Convert.ChangeType(value, resultType);
-            }
-
-            return (T)value;
         }
 
         [PublicAPI]
@@ -111,6 +110,18 @@ namespace CustomJSONData.CustomBeatmap
             }
 
             return null;
+        }
+
+        [PublicAPI]
+        public Color? GetColor(string key)
+        {
+            List<float>? color = Get<List<object>>(key)?.Select(Convert.ToSingle).ToList();
+            if (color == null)
+            {
+                return null;
+            }
+
+            return new Color(color[0], color[1], color[2], color.Count > 3 ? color[3] : 1);
         }
 
         [PublicAPI]
@@ -143,14 +154,13 @@ namespace CustomJSONData.CustomBeatmap
 
         private static string FormatDictionary(CustomData dictionary, int indent = 0)
         {
-            string prefix = new('\t', indent);
+            string prefix = new(' ', indent * 2);
             StringBuilder builder = new();
-            builder.AppendLine(prefix + "{");
-            foreach ((string? key, object? value) in dictionary)
-            {
-                builder.AppendLine($"{prefix}\t\"{key}\": {FormatObject(value, indent + 1)}");
-            }
-
+            builder.AppendLine("{");
+            builder.AppendLine(string.Join(
+                ",\n",
+                dictionary.Select(n => $"{prefix}  \"{n.Key}\": {FormatObject(n.Value, indent + 1)}")));
+            builder.AppendLine();
             builder.Append(prefix + "}");
             return builder.ToString();
         }

@@ -32,6 +32,7 @@ namespace CustomJSONData
             throw new JsonReaderException(reader.FormatMessage($"Input string [{result}] is not a valid integer."));
         }
 
+        [PublicAPI]
         public static Color ReadAsColor(this JsonReader reader)
         {
             float r = default;
@@ -107,52 +108,46 @@ namespace CustomJSONData
             return true;
         }
 
+        [PublicAPI]
         public static string[] ReadAsStringArray(this JsonReader reader, bool doThrow = true)
         {
             List<string> result = new();
-            reader.ReadArray(
-                () =>
+            reader.Read(); // StartArray
+            if (!reader.AssertToken("string array", JsonToken.StartArray, doThrow))
             {
-                reader.Read();
-                if (reader.TokenType != JsonToken.String)
-                {
-                    return false;
-                }
+                return result.ToArray();
+            }
 
+            while (reader.TokenType != JsonToken.EndArray)
+            {
                 string? cur = reader.ReadAsString();
                 if (cur != null)
                 {
                     result.Add(cur);
                 }
-
-                return true;
-            },
-                doThrow);
+            }
 
             return result.ToArray();
         }
 
+        [PublicAPI]
         public static int[] ReadAsIntArray(this JsonReader reader, bool doThrow = true)
         {
             List<int> result = new();
-            reader.ReadArray(
-                () =>
+            reader.Read(); // StartArray
+            if (!reader.AssertToken("int array", JsonToken.StartArray, doThrow))
+            {
+                return result.ToArray();
+            }
+
+            while (reader.TokenType != JsonToken.EndArray)
+            {
+                int? cur = reader.ReadAsInt32Safe();
+                if (cur != null)
                 {
-                    reader.Read();
-                    if (reader.TokenType != JsonToken.Integer && reader.TokenType != JsonToken.Float)
-                    {
-                        return false;
-                    }
-
-                    int? cur = reader.ReadAsInt32Safe();
-                    if (cur != null)
-                    {
-                        result.Add(cur.Value);
-                    }
-
-                    return true;
-                },
-                doThrow);
+                    result.Add(cur.Value);
+                }
+            }
 
             return result.ToArray();
         }
@@ -202,7 +197,7 @@ namespace CustomJSONData
                 throw new JsonSerializationException(message);
             }
 
-            Logger.Log(message + " Error while reading customData, exception skipped.", IPA.Logging.Logger.Level.Error);
+            Plugin.Log.Error(message + " Error while reading customData, exception skipped");
             reader.Skip();
             return false;
         }
