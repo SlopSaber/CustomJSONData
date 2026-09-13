@@ -22,7 +22,7 @@ namespace CustomJSONData.CustomBeatmap
             float songDuration,
             PlayerSensitivityFlag contentRating,
             IPreviewMediaData previewMediaData,
-            IReadOnlyDictionary<(BeatmapCharacteristicSO BeatmapCharacteristicSO, BeatmapDifficulty BeatmapDifficulty), BeatmapBasicData> beatmapBasicData,
+            IReadOnlyDictionary<(BeatmapCharacteristic BeatmapCharacteristic, BeatmapDifficulty BeatmapDifficulty), BeatmapBasicData> beatmapBasicData,
             CustomData customData)
             : base(
                 version,
