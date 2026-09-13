@@ -66,12 +66,12 @@ namespace CustomJSONData.HarmonyPatches
                     false,
                     new CodeMatch(OpCodes.Stloc_1))
                 .InsertAndAdvance(
+                    new CodeInstruction(OpCodes.Ldarg_0),
                     new CodeInstruction(OpCodes.Ldfld, _beatmapLevelData),
                     new CodeInstruction(OpCodes.Ldarg_0),
                     new CodeInstruction(OpCodes.Ldfld, _beatmapKey),
                     new CodeInstruction(OpCodes.Ldloc_1),
-                    new CodeInstruction(OpCodes.Call, _injectCustomData),
-                    new CodeInstruction(OpCodes.Ldarg_0))
+                    new CodeInstruction(OpCodes.Call, _injectCustomData))
                 .InstructionEnumeration();
         }
     }
