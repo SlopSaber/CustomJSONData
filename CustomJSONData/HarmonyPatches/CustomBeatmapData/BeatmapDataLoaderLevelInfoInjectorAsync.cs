@@ -64,17 +64,12 @@ namespace CustomJSONData.HarmonyPatches
                 .End()
                 .MatchBack(
                     false,
-                    new CodeMatch(n =>
-                        n.opcode == OpCodes.Ldfld && ((FieldInfo)n.operand).Name == "enableBeatmapDataCaching"))
+                    new CodeMatch(OpCodes.Stloc_1))
                 .InsertAndAdvance(
                     new CodeInstruction(OpCodes.Ldfld, _beatmapLevelData),
                     new CodeInstruction(OpCodes.Ldarg_0),
                     new CodeInstruction(OpCodes.Ldfld, _beatmapKey),
-#if LATEST
-                    new CodeInstruction(OpCodes.Ldloc_S, 12),
-#else
-                    new CodeInstruction(OpCodes.Ldloc_S, 11),
-#endif
+                    new CodeInstruction(OpCodes.Ldloc_1),
                     new CodeInstruction(OpCodes.Call, _injectCustomData),
                     new CodeInstruction(OpCodes.Ldarg_0))
                 .InstructionEnumeration();
