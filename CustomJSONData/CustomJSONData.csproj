@@ -13,6 +13,10 @@
     <DefineConstants>$(DefineConstants);ASYNC_BEATMAP_LOADER_ONLY</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(Configuration.EndsWith('1.45.1'))">
+    <DefineConstants>$(DefineConstants);BEATMAP_CALLBACK_TYPE_IDS</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup>
     <PluginId>CustomJSONData</PluginId>
     <PluginName>CustomJSONData</PluginName>

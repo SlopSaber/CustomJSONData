@@ -12,6 +12,18 @@ namespace CustomJSONData.HarmonyPatches
         [HarmonyPatch(nameof(BeatmapCallbacksController.ManualUpdate))]
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
+#if BEATMAP_CALLBACK_TYPE_IDS
+            // Event callbacks bypass the object start-time filter. Keep the existing
+            // branch and include custom events without copying IL or exception labels.
+            return new CodeMatcher(instructions)
+                .MatchForward(false,
+                    new CodeMatch(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(BeatmapDataItem), nameof(BeatmapDataItem.type))),
+                    new CodeMatch(OpCodes.Ldc_I4_1),
+                    new CodeMatch(instruction => instruction.opcode == OpCodes.Beq || instruction.opcode == OpCodes.Beq_S))
+                .ThrowIfInvalid("Could not find the event callback filter")
+                .Set(OpCodes.Call, AccessTools.Method(typeof(CustomEventValidator), nameof(IsEvent)))
+                .InstructionEnumeration();
+#else
             CodeMatcher matcher = new CodeMatcher(instructions)
                 .MatchForward(
                     false,
@@ -35,6 +47,14 @@ namespace CustomJSONData.HarmonyPatches
                 .Insert(new CodeInstruction(OpCodes.Nop))
 
                 .InstructionEnumeration();
+#endif
         }
+
+#if BEATMAP_CALLBACK_TYPE_IDS
+        private static bool IsEvent(BeatmapDataItem item)
+        {
+            return (int)item.type == 1 || item is CustomBeatmap.CustomEventData;
+        }
+#endif
     }
 }
