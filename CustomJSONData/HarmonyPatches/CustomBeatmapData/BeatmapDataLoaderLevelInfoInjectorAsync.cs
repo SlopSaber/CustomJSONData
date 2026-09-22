@@ -1,4 +1,37 @@
 ﻿#if !PRE_V1_37_1
+#if ASYNC_BEATMAP_LOADER_ONLY
+using System.Threading.Tasks;
+using CustomJSONData.CustomBeatmap;
+using HarmonyLib;
+
+namespace CustomJSONData.HarmonyPatches
+{
+    [HarmonyPatch(typeof(BeatmapDataLoader), nameof(BeatmapDataLoader.LoadBeatmapDataAsync))]
+    internal static class BeatmapDataLoaderLevelInfoInjectorAsync
+    {
+        [HarmonyPostfix]
+        private static void Postfix(ref Task<IReadonlyBeatmapData> __result, IBeatmapLevelData beatmapLevelData, BeatmapKey beatmapKey)
+        {
+            __result = InjectCustomDataAsync(__result, beatmapLevelData, beatmapKey);
+        }
+
+        private static async Task<IReadonlyBeatmapData> InjectCustomDataAsync(Task<IReadonlyBeatmapData> task, IBeatmapLevelData beatmapLevelData, BeatmapKey beatmapKey)
+        {
+            IReadonlyBeatmapData result = await task.ConfigureAwait(false);
+            if (beatmapLevelData is CustomFileBeatmapLevelData fileBeatmapLevelData && result is CustomBeatmapData beatmapData)
+            {
+                beatmapData.levelCustomData = fileBeatmapLevelData.customData;
+                if (fileBeatmapLevelData.GetDifficultyBeatmap(beatmapKey) is CustomFileDifficultyBeatmap customFileDifficultyBeatmap)
+                {
+                    beatmapData.beatmapCustomData = customFileDifficultyBeatmap.customData;
+                }
+            }
+
+            return result;
+        }
+    }
+}
+#else
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -76,4 +109,5 @@ namespace CustomJSONData.HarmonyPatches
         }
     }
 }
+#endif
 #endif

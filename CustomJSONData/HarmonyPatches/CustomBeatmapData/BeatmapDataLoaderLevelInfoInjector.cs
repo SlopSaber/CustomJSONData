@@ -1,4 +1,4 @@
-﻿#if !PRE_V1_37_1
+﻿#if !PRE_V1_37_1 && !ASYNC_BEATMAP_LOADER_ONLY
 using CustomJSONData.CustomBeatmap;
 using HarmonyLib;
 
