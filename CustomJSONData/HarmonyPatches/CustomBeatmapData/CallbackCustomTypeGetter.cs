@@ -28,7 +28,7 @@ namespace CustomJSONData.HarmonyPatches
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             return new CodeMatcher(instructions)
-                .MatchForward(false, new CodeMatch(OpCodes.Callvirt, _getType))
+                .MatchForward(false, new CodeMatch(instruction => instruction.Calls(_getType)))
                 .Set(OpCodes.Call, _getCustomType)
                 .InstructionEnumeration();
         }
