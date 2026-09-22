@@ -16,7 +16,8 @@ namespace CustomJSONData.HarmonyPatches
             // Event callbacks bypass the object start-time filter. Keep the existing
             // branch and include custom events without copying IL or exception labels.
             return new CodeMatcher(instructions)
-                .MatchForward(false,
+                .MatchForward(
+                    false,
                     new CodeMatch(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(BeatmapDataItem), nameof(BeatmapDataItem.type))),
                     new CodeMatch(OpCodes.Ldc_I4_1),
                     new CodeMatch(instruction => instruction.opcode == OpCodes.Beq || instruction.opcode == OpCodes.Beq_S))
