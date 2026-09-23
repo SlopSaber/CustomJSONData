@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <ImportBSMTTargets>true</ImportBSMTTargets>
+    <BSMTProjectType>BSIPA</BSMTProjectType>
+    <GameDirectory Condition="!$(Configuration.EndsWith('1.45.1')) AND '$(GameDirectory)' == ''">$(BeatSaberDir)</GameDirectory>
+    <GameDirectory Condition="$(Configuration.EndsWith('1.45.1'))">D:\BSManager\BSInstances\1.45.1</GameDirectory>
+    <CopyPDB>false</CopyPDB>
+    <DisableCopyToGame Condition="$(Configuration.EndsWith('1.45.1'))">false</DisableCopyToGame>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
     <LangVersion>9</LangVersion>
@@ -29,18 +35,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony" HintPath="$(BeatSaberDir)\Libs\0Harmony.dll" />
-    <Reference Include="AdditionalContentModel.Interfaces" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\AdditionalContentModel.Interfaces.dll" />
-    <Reference Include="BeatmapCore" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\BeatmapCore.dll" Publicize="true" />
-    <Reference Include="Colors" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\Colors.dll" Publicize="true" />
-    <Reference Include="DataModels" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\DataModels.dll" Publicize="true" />
-    <Reference Include="GameplayCore" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll" />
-    <Reference Include="HMLib" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\HMLib.dll" />
-    <Reference Include="IPA.Loader" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll" />
-    <Reference Include="Main" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll" Publicize="true" />
-    <Reference Include="Newtonsoft.Json" HintPath="$(BeatSaberDir)\Libs\Newtonsoft.Json.dll" />
-    <Reference Include="Tweening" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\Tweening.dll" />
-    <Reference Include="UnityEngine.CoreModule" HintPath="$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll" />
+    <Reference Include="0Harmony" HintPath="$(GameDirectory)\Libs\0Harmony.dll" />
+    <Reference Include="AdditionalContentModel.Interfaces" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\AdditionalContentModel.Interfaces.dll" />
+    <Reference Include="BeatmapCore" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\BeatmapCore.dll" Publicize="true" />
+    <Reference Include="Colors" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\Colors.dll" Publicize="true" />
+    <Reference Include="DataModels" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\DataModels.dll" Publicize="true" />
+    <Reference Include="GameplayCore" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\GameplayCore.dll" />
+    <Reference Include="HMLib" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\HMLib.dll" />
+    <Reference Include="IPA.Loader" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\IPA.Loader.dll" />
+    <Reference Include="Main" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\Main.dll" Publicize="true" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(GameDirectory)\Libs\Newtonsoft.Json.dll" />
+    <Reference Include="Tweening" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\Tweening.dll" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(GameDirectory)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll" />
   </ItemGroup>
 
   <ItemGroup>
