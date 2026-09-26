@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 
@@ -11,17 +9,29 @@ namespace CustomJSONData
         // AccessTools.ActualParameters except this one throws exceptions.
         public static object[] ActualParameters(this MethodBase method, object[] inputs)
         {
-            List<Type> inputTypes = inputs.Select(obj => obj.GetType()).ToList();
-            return method.GetParameters().Select(p =>
+            ParameterInfo[] parameters = method.GetParameters();
+            object[] actualParameters = new object[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
             {
-                int index = inputTypes.FindIndex(p.ParameterType.IsAssignableFrom);
-                if (index >= 0)
+                ParameterInfo parameter = parameters[i];
+                bool found = false;
+                foreach (object input in inputs)
                 {
-                    return inputs[index];
+                    if (input != null && parameter.ParameterType.IsAssignableFrom(input.GetType()))
+                    {
+                        actualParameters[i] = input;
+                        found = true;
+                        break;
+                    }
                 }
 
-                throw new InvalidOperationException($"[{method.FullDescription()}] requested [{p.ParameterType.FullName}] but was not available.");
-            }).ToArray();
+                if (!found)
+                {
+                    throw new InvalidOperationException($"[{method.FullDescription()}] requested [{parameter.ParameterType.FullName}] but was not available.");
+                }
+            }
+
+            return actualParameters;
         }
     }
 }

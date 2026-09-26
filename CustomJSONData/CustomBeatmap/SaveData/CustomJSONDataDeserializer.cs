@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -47,8 +46,13 @@ namespace CustomJSONData.CustomBeatmap
 
         public static bool Activate(object[] inputs, string field)
         {
-            foreach (CustomJSONDataDeserializer deserializer in _deserializers.Where(n => n.Enabled))
+            foreach (CustomJSONDataDeserializer deserializer in _deserializers)
             {
+                if (!deserializer.Enabled)
+                {
+                    continue;
+                }
+
                 if (deserializer._methods.TryGetValue(field, out MethodInfo method))
                 {
                     return (bool)method.Invoke(null, method.ActualParameters(inputs));

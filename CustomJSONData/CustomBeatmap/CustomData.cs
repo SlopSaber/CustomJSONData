@@ -25,8 +25,7 @@ namespace CustomJSONData.CustomBeatmap
         [PublicAPI]
         public static CustomData FromJSON(string jsonString)
         {
-            using MemoryStream stream = new(Encoding.UTF8.GetBytes(jsonString));
-            using JsonTextReader reader = new(new StreamReader(jsonString));
+            using JsonTextReader reader = new(new StringReader(jsonString));
             return FromJSON(reader);
         }
 
@@ -90,14 +89,8 @@ namespace CustomJSONData.CustomBeatmap
         [PublicAPI]
         public Vector3? GetVector3(string key)
         {
-            List<float>? data = Get<List<object>>(key)?.Select(Convert.ToSingle).ToList();
-            Vector3? final = null;
-            if (data != null)
-            {
-                final = new Vector3(data[0], data[1], data[2]);
-            }
-
-            return final;
+            List<object>? data = Get<List<object>>(key);
+            return data == null ? null : new Vector3(Convert.ToSingle(data[0]), Convert.ToSingle(data[1]), Convert.ToSingle(data[2]));
         }
 
         [PublicAPI]
@@ -115,13 +108,13 @@ namespace CustomJSONData.CustomBeatmap
         [PublicAPI]
         public Color? GetColor(string key)
         {
-            List<float>? color = Get<List<object>>(key)?.Select(Convert.ToSingle).ToList();
+            List<object>? color = Get<List<object>>(key);
             if (color == null)
             {
                 return null;
             }
 
-            return new Color(color[0], color[1], color[2], color.Count > 3 ? color[3] : 1);
+            return new Color(Convert.ToSingle(color[0]), Convert.ToSingle(color[1]), Convert.ToSingle(color[2]), color.Count > 3 ? Convert.ToSingle(color[3]) : 1);
         }
 
         [PublicAPI]
