@@ -142,7 +142,7 @@ namespace CustomJSONData.CustomBeatmap
         {
             this.version = version;
 #if PRE_V1_37_1
-            beatmapVersion = new Version(version);
+            beatmapVersion = string.IsNullOrEmpty(version) ? VersionExtensions.noVersion : new Version(version);
             this.beatmapCustomData = beatmapCustomData;
             this.levelCustomData = levelCustomData;
 #endif
@@ -173,7 +173,8 @@ namespace CustomJSONData.CustomBeatmap
 #else
             string version = GetVersionFromPath(path);
 
-            if (new Version(version).CompareTo(version2_6_0) <= 0)
+            if (string.IsNullOrEmpty(version) ||
+                new Version(version).CompareTo(version2_6_0) <= 0)
             {
                 return SaveData2_6_0Converter.Convert2_6_0AndEarlier(path, beatmapCustomData, levelCustomData);
             }
@@ -381,8 +382,6 @@ namespace CustomJSONData.CustomBeatmap
         public static string GetVersionFromPath(string path)
         {
             // SongCore has a fallback so i guess i do too
-            const string fallback = "2.0.0";
-
             // cant think of a better way than opening a streamreader
             using JsonTextReader reader = new(new StreamReader(path));
             while (reader.Read())
@@ -402,8 +401,8 @@ namespace CustomJSONData.CustomBeatmap
                 }
             }
 
-            Plugin.Log.Debug($"[{path}] does not contain a version, falling back to [{fallback}]");
-            return fallback;
+            Plugin.Log.Debug($"[{path}] does not contain a version");
+            return string.Empty;
         }
 #endif
 
@@ -1081,6 +1080,7 @@ namespace CustomJSONData.CustomBeatmap
                                                 float strobeBrightness = default;
                                                 bool strobeFade = default;
 #endif
+                                                CustomData lightData = new();
                                                 return reader.ReadObject(lightName =>
                                                 {
                                                     switch (lightName)
@@ -1121,11 +1121,15 @@ namespace CustomJSONData.CustomBeatmap
                                                             break;
 #endif
 
+                                                        case _customData:
+                                                            reader.ReadToDictionary(lightData);
+                                                            break;
+
                                                         default:
                                                             reader.Skip();
                                                             break;
                                                     }
-                                                }).Finish(() => lightColorBaseDataList.Add(new _LightColorBaseData(
+                                                }).Finish(() => lightColorBaseDataList.Add(new LightColorBaseDataSaveData(
                                                     lightBeat,
                                                     transitionType,
                                                     colorType,
@@ -1133,10 +1137,11 @@ namespace CustomJSONData.CustomBeatmap
 #if !V1_29_1
                                                     strobeFrequency,
                                                     strobeBrightness,
-                                                    strobeFade)));
+                                                    strobeFade,
 #else
-                                                    strobeFrequency)));
+                                                    strobeFrequency,
 #endif
+                                                    lightData)));
                                             });
                                             break;
 

@@ -8,8 +8,16 @@ namespace CustomJSONData.HarmonyPatches
 {
 #if BEATMAP_CALLBACK_TYPE_IDS
     [HarmonyPatch(typeof(BeatmapDataItem))]
+#elif LATEST
+    [HarmonyPatch(
+        typeof(BeatmapDataItem),
+        MethodType.Constructor,
+        typeof(float),
+        typeof(int),
+        typeof(int),
+        typeof(BeatmapDataItem.BeatmapDataItemType))]
 #else
-    [HarmonyPatch(typeof(CallbacksInTime))]
+    [HarmonyPatch(typeof(CallbacksInTime), nameof(CallbacksInTime.CallCallbacks), typeof(BeatmapDataItem))]
 #endif
     internal static class CallbackCustomTypeGetter
     {
@@ -22,8 +30,6 @@ namespace CustomJSONData.HarmonyPatches
         // Normalize custom subclasses before those IDs are computed so both
         // concrete and base-type callbacks behave like their vanilla counterparts.
         [HarmonyPatch(MethodType.Constructor, new[] { typeof(float), typeof(int), typeof(int), typeof(BeatmapDataItem.BeatmapDataItemType) })]
-#else
-        [HarmonyPatch(nameof(CallbacksInTime.CallCallbacks), typeof(BeatmapDataItem))]
 #endif
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
