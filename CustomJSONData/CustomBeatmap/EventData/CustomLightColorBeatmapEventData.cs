@@ -21,6 +21,46 @@ namespace CustomJSONData.CustomBeatmap
             float strobeBrightness,
             bool strobeFade,
 #endif
+            CustomData customData)
+            : this(
+                time,
+                groupId,
+                elementId,
+#if PRE_V1_37_1
+                transitionType,
+#else
+                usePreviousValue,
+                easeType,
+#endif
+                colorType,
+                brightness,
+                strobeBeatFrequency,
+#if !V1_29_1
+                strobeBrightness,
+                strobeFade,
+#endif
+                customData,
+                VersionExtensions.version3)
+        {
+        }
+
+        public CustomLightColorBeatmapEventData(
+            float time,
+            int groupId,
+            int elementId,
+#if PRE_V1_37_1
+            BeatmapEventTransitionType transitionType,
+#else
+            bool usePreviousValue,
+            EaseType easeType,
+#endif
+            EnvironmentColorType colorType,
+            float brightness,
+            int strobeBeatFrequency,
+#if !V1_29_1
+            float strobeBrightness,
+            bool strobeFade,
+#endif
             CustomData customData,
             Version version)
             : base(
