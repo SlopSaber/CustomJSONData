@@ -14,12 +14,15 @@ namespace CustomJSONData.CustomBeatmap
     [JsonConverter(typeof(CustomDataConverter))]
     public class CustomData : ConcurrentDictionary<string, object?>
     {
+        // Most per-note/event objects contain only a few properties. They are populated
+        // by one parser worker; runtime consumers still retain concurrent access safety.
         public CustomData()
+            : base(concurrencyLevel: 1, capacity: 4)
         {
         }
 
         public CustomData(IEnumerable<KeyValuePair<string, object?>> collection)
-            : base(collection)
+            : base(concurrencyLevel: 1, collection: collection, comparer: EqualityComparer<string>.Default)
         {
         }
 
