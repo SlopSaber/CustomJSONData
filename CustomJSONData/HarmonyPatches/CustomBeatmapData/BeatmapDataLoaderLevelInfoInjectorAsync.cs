@@ -18,16 +18,23 @@ namespace CustomJSONData.HarmonyPatches
         private static async Task<IReadonlyBeatmapData> InjectCustomDataAsync(Task<IReadonlyBeatmapData> task, IBeatmapLevelData beatmapLevelData, BeatmapKey beatmapKey)
         {
             IReadonlyBeatmapData result = await task.ConfigureAwait(false);
-            if (beatmapLevelData is CustomFileBeatmapLevelData fileBeatmapLevelData && result is CustomBeatmapData beatmapData)
+            if (beatmapLevelData is not CustomFileBeatmapLevelData fileBeatmapLevelData || result is not CustomBeatmapData beatmapData)
+            {
+                return result;
+            }
+
+            // ConfigureAwait(false) does not switch threads for a completed task.
+            // Schedule the data-only attachment explicitly, then publish the result.
+            return await Task.Run(() =>
             {
                 beatmapData.levelCustomData = fileBeatmapLevelData.customData;
                 if (fileBeatmapLevelData.GetDifficultyBeatmap(beatmapKey) is CustomFileDifficultyBeatmap customFileDifficultyBeatmap)
                 {
                     beatmapData.beatmapCustomData = customFileDifficultyBeatmap.customData;
                 }
-            }
 
-            return result;
+                return result;
+            }).ConfigureAwait(false);
         }
     }
 }

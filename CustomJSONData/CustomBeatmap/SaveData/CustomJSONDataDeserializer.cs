@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using HarmonyLib;
 using JetBrains.Annotations;
 
@@ -8,9 +9,11 @@ namespace CustomJSONData.CustomBeatmap
 {
     public class CustomJSONDataDeserializer
     {
-        private static readonly List<CustomJSONDataDeserializer> _deserializers = new();
+        private static readonly object _deserializerLock = new();
+        private static CustomJSONDataDeserializer[] _deserializers = Array.Empty<CustomJSONDataDeserializer>();
 
         private readonly Dictionary<string, MethodInfo> _methods = new();
+        private bool _enabled = true;
 
 #pragma warning disable 8618
         private CustomJSONDataDeserializer(Type type)
@@ -34,19 +37,34 @@ namespace CustomJSONData.CustomBeatmap
         }
 
         [PublicAPI]
-        public bool Enabled { get; set; } = true;
+        public bool Enabled
+        {
+            get => Volatile.Read(ref _enabled);
+            set => Volatile.Write(ref _enabled, value);
+        }
 
         [PublicAPI]
         public static CustomJSONDataDeserializer Register<T>()
         {
             CustomJSONDataDeserializer deserializer = new(typeof(T));
-            _deserializers.Add(deserializer);
+            lock (_deserializerLock)
+            {
+                CustomJSONDataDeserializer[] current = _deserializers;
+                CustomJSONDataDeserializer[] updated = new CustomJSONDataDeserializer[current.Length + 1];
+                Array.Copy(current, updated, current.Length);
+                updated[current.Length] = deserializer;
+                Volatile.Write(ref _deserializers, updated);
+            }
+
             return deserializer;
         }
 
         public static bool Activate(object[] inputs, string field)
         {
-            foreach (CustomJSONDataDeserializer deserializer in _deserializers)
+            // Snapshot membership so registration cannot invalidate a parser worker's
+            // enumeration. Invoke callbacks outside the registration lock.
+            CustomJSONDataDeserializer[] deserializers = Volatile.Read(ref _deserializers);
+            foreach (CustomJSONDataDeserializer deserializer in deserializers)
             {
                 if (!deserializer.Enabled)
                 {
