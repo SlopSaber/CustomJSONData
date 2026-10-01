@@ -121,6 +121,11 @@ namespace CustomJSONData
             while (reader.TokenType != JsonToken.EndArray)
             {
                 string? cur = reader.ReadAsString();
+                if (reader.TokenType == JsonToken.None)
+                {
+                    throw reader.CreateException("Unexpected end when reading string array.");
+                }
+
                 if (cur != null)
                 {
                     result.Add(cur);
@@ -143,6 +148,11 @@ namespace CustomJSONData
             while (reader.TokenType != JsonToken.EndArray)
             {
                 int? cur = reader.ReadAsInt32Safe();
+                if (reader.TokenType == JsonToken.None)
+                {
+                    throw reader.CreateException("Unexpected end when reading int array.");
+                }
+
                 if (cur != null)
                 {
                     result.Add(cur.Value);
