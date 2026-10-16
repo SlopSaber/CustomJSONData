@@ -45,6 +45,8 @@
 
   <Target Name="BSIPA_ResolveLayoutReferences" BeforeTargets="ResolveAssemblyReferences">
     <PropertyGroup>
+      <TargetFrameworkDirectory Condition="'$(EnableFrameworkPathOverride)' == 'true'">$(FrameworkPathOverride)</TargetFrameworkDirectory>
+      <TargetFrameworkDirectories Condition="'$(EnableFrameworkPathOverride)' == 'true'">$(FrameworkPathOverride)</TargetFrameworkDirectories>
       <DefineConstants>$(DefineConstants);BSIPA_MODS</DefineConstants>
       <DefineConstants Condition="'$(GameVersion)' == '1.45.3'">$(DefineConstants);BEAT_SABER_1453</DefineConstants>
     </PropertyGroup>
