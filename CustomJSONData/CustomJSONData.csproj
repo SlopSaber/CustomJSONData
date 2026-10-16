@@ -18,7 +18,7 @@
     <Description>Lets mappers include arbitrary data in beatmaps, and lets modders access that data. Why did I make this? Good question.</Description>
   </PropertyGroup>
   <ItemGroup>
-    <DependsOn Include="BSIPA" Version="^4.2.2" />
+    <DependsOn Include="BSIPA" Version="^5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
