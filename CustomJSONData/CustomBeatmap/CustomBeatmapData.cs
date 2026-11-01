@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using HarmonyLib;
 using IPA.Utilities;
 using JetBrains.Annotations;
+using Unity.Profiling;
 
 namespace CustomJSONData.CustomBeatmap
 {
     [HarmonyPatch(typeof(BeatmapData))]
     public sealed class CustomBeatmapData : BeatmapData, ICustomData, IVersionable
     {
+        private static readonly ProfilerMarker _getCopyMarker = new("CustomJSONData.GetCopy");
+        private static readonly ProfilerMarker _getFilteredCopyMarker = new("CustomJSONData.GetFilteredCopy");
+
         private static readonly FieldAccessor<BeatmapData, BeatmapDataSortedListForTypeAndIds<BeatmapDataItem>>.Accessor _beatmapDataItemsPerTypeAccessor =
             FieldAccessor<BeatmapData, BeatmapDataSortedListForTypeAndIds<BeatmapDataItem>>.GetAccessor(nameof(_beatmapDataItemsPerTypeAndId));
 
@@ -97,6 +101,7 @@ namespace CustomJSONData.CustomBeatmap
                 return true;
             }
 
+            using ProfilerMarker.AutoScope profile = _getCopyMarker.Auto();
             CustomBeatmapData beatmapData = new(
                 customBeatmapData._numberOfLines,
                 customBeatmapData.beatmapCustomData.Copy(),
@@ -133,6 +138,7 @@ namespace CustomJSONData.CustomBeatmap
                 return true;
             }
 
+            using ProfilerMarker.AutoScope profile = _getFilteredCopyMarker.Auto();
             customBeatmapData._isCreatingFilteredCopy = true;
             CustomBeatmapData beatmapData = new(
                 customBeatmapData._numberOfLines,

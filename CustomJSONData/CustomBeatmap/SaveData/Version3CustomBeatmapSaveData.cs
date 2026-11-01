@@ -5,6 +5,7 @@ using System.Linq;
 using BeatmapSaveDataVersion3;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Unity.Profiling;
 #if !PRE_V1_37_1
 using _Axis = BeatmapSaveDataCommon.Axis;
 using _BasicEventData = BeatmapSaveDataVersion3.BasicEventData;
@@ -92,6 +93,9 @@ namespace CustomJSONData.CustomBeatmap
 
         private const string _customData = "customData";
 
+        private static readonly ProfilerMarker _deserializeMarker = new("CustomJSONData.DeserializeV3");
+        private static readonly ProfilerMarker _sortMarker = new("CustomJSONData.SortV3");
+
         public Version3CustomBeatmapSaveData(
             string version,
             List<_BpmChangeEventData> bpmEvents,
@@ -168,6 +172,7 @@ namespace CustomJSONData.CustomBeatmap
         public static Version3CustomBeatmapSaveData Deserialize(string path, CustomData beatmapCustomData, CustomData levelCustomData)
 #endif
         {
+            using ProfilerMarker.AutoScope profile = _deserializeMarker.Auto();
 #if !PRE_V1_37_1
             string version = string.Empty;
 #else
@@ -348,6 +353,7 @@ namespace CustomJSONData.CustomBeatmap
                 }
             }
 
+            using ProfilerMarker.AutoScope sorting = _sortMarker.Auto();
             return new Version3CustomBeatmapSaveData(
                 version,
                 bpmEvents.OrderBy(n => n).ToList(),

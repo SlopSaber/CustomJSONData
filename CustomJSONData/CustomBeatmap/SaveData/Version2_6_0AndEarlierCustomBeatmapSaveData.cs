@@ -2,6 +2,7 @@
 using System.IO;
 using BeatmapSaveDataVersion2_6_0AndEarlier;
 using Newtonsoft.Json;
+using Unity.Profiling;
 #if !PRE_V1_37_1
 using _BeatmapEventType = BeatmapSaveDataCommon.BeatmapEventType;
 using _ColorType = BeatmapSaveDataVersion2_6_0AndEarlier.ColorType;
@@ -40,6 +41,8 @@ namespace CustomJSONData.CustomBeatmap
 {
     public class Version2_6_0AndEarlierCustomBeatmapSaveData : BeatmapSaveData
     {
+        private static readonly ProfilerMarker _deserializeMarker = new("CustomJSONData.DeserializeV2");
+
         private Version2_6_0AndEarlierCustomBeatmapSaveData(
             string version,
             List<_EventData> events,
@@ -69,6 +72,7 @@ namespace CustomJSONData.CustomBeatmap
 
         public static Version2_6_0AndEarlierCustomBeatmapSaveData Deserialize(string path)
         {
+            using ProfilerMarker.AutoScope profile = _deserializeMarker.Auto();
             string version = string.Empty;
             CustomData customData = new();
             List<CustomEventSaveData> customEvents = new();
